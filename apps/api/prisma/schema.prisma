@@ -1,0 +1,19 @@
+// This is the Prisma schema file — single source of truth for the database shape.
+// After modifying this file, always run: yarn workspace @fixfirst/api db:generate
+// Connection URL is configured in prisma.config.ts (Prisma 7+).
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Placeholder — full schema is defined in issue #10.
+// Added so Prisma client generation works during early setup.
+model User {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+}
