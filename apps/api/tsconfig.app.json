@@ -5,7 +5,9 @@
     "module": "CommonJS",
     "moduleResolution": "Node",
     "types": ["node"],
-    "lib": ["ES2022"]
+    "lib": ["ES2022"],
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
   "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "include": ["src/**/*.ts"]
