@@ -27,3 +27,4 @@
 
 export type { AuthResponse, AuthUser, JwtPayload } from './auth';
 export type { ProductSummary, UserProductDetail, WarrantySummary, WarrantyType } from './products';
+export type { OcrStatus, ReceiptFields } from './receipts';
