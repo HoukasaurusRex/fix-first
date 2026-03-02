@@ -1,0 +1,10 @@
+# Build outputs
+dist
+.next
+coverage
+
+# Dependencies
+node_modules
+
+# Generated files
+*.lock

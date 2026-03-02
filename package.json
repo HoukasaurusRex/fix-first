@@ -1,0 +1,26 @@
+{
+  "name": "warranty-tool",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "yarn workspaces run build",
+    "test": "yarn workspaces run test",
+    "lint": "yarn workspaces run lint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "dev:api": "yarn workspace @warranty-tool/api dev",
+    "dev:web": "yarn workspace @warranty-tool/web dev"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.4.0",
+    "typescript": "^5.7.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}
