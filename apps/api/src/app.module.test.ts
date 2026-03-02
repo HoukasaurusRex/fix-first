@@ -8,6 +8,8 @@ test('AppModule compiles without errors', async () => {
   // Provide required env vars consumed during module initialization
   process.env.JWT_ACCESS_SECRET = 'test-secret';
   process.env.JWT_REFRESH_SECRET = 'test-refresh-secret';
+  process.env.AWS_REGION = 'ca-central-1';
+  process.env.AWS_S3_BUCKET = 'test-bucket';
 
   const module = await Test.createTestingModule({
     imports: [AppModule],
