@@ -126,9 +126,11 @@ model Receipt {
   s3Key         String    @unique
   ocrStatus     OcrStatus @default(pending)
   retailer      String?
+  productName   String?
   purchasedAt   DateTime?
   price         Decimal?  @db.Decimal(10, 2)
   currency      String?   @default("CAD")
+  paymentMethod String?
   rawText       String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt

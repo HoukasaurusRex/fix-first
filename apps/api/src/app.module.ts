@@ -4,6 +4,7 @@ import { AuthModule } from './auth/auth.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { OcrModule } from './ocr/ocr.module';
+import { ReceiptsModule } from './receipts/receipts.module';
 import { StorageModule } from './storage/storage.module';
 import { UserProductsModule } from './user-products/user-products.module';
 import { UsersModule } from './users/users.module';
@@ -20,6 +21,7 @@ import { WarrantiesModule } from './warranties/warranties.module';
     WarrantiesModule,
     StorageModule,
     OcrModule,
+    ReceiptsModule,
   ],
 })
 export class AppModule {}
