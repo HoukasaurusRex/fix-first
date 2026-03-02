@@ -23,75 +23,81 @@ This tool aims to:
 
 ---
 
+## Tech stack
+
+| Layer             | Technology                                              |
+| ----------------- | ------------------------------------------------------- |
+| Monorepo          | Yarn Workspaces                                         |
+| Language          | TypeScript 5 (`tsc` for compilation)                    |
+| API server        | NestJS (Express platform adapter)                       |
+| Web frontend      | Next.js 15 (App Router, React 19)                       |
+| Database          | PostgreSQL 15+ (docker-compose locally)                 |
+| ORM               | Prisma                                                  |
+| Auth              | JWT (access + refresh tokens, `jsonwebtoken`)           |
+| Object storage    | AWS S3 (SDK v3)                                         |
+| OCR               | Tesseract.js                                            |
+| Testing           | Node built-in test runner (`node:test`)                 |
+| Infrastructure    | AWS CDK (`apps/infra`)                                  |
+| CI/CD             | GitHub Actions                                          |
+| Local deps        | docker-compose (PostgreSQL, MailHog for email preview)  |
+| Linting           | ESLint 9 (flat config) + typescript-eslint              |
+| Formatting        | Prettier                                                |
+
+---
+
 ## Monorepo structure
 
 ```text
-warranty-tool/
+fix-first/
 ├── apps/
-│   ├── api/            # Fastify REST API (Node.js + TypeScript)
-│   └── web/            # Next.js consumer frontend (React + TypeScript)
+│   ├── api/            # NestJS REST API
+│   ├── web/            # Next.js 15 frontend
+│   └── infra/          # AWS CDK infrastructure app
 ├── packages/
-│   └── shared-types/   # Shared TypeScript interfaces used across apps
-├── tsconfig.base.json  # Root TypeScript config (extended by all apps/packages)
-├── eslint.config.mjs   # Workspace-wide ESLint (flat config)
+│   └── shared-types/   # Shared TypeScript interfaces
+├── docker-compose.yml  # Local: PostgreSQL 15, MailHog
+├── tsconfig.base.json
+├── eslint.config.mjs
 └── package.json        # Yarn workspaces root
 ```
 
 ---
 
-## Tech stack
-
-| Layer           | Technology                                              |
-| --------------- | ------------------------------------------------------- |
-| Monorepo        | [Yarn Workspaces](https://yarnpkg.com)                  |
-| Language        | TypeScript 5                                            |
-| API server      | [Fastify](https://fastify.dev) (Node.js)                |
-| Web frontend    | [Next.js 15](https://nextjs.org) (App Router)           |
-| Database        | PostgreSQL                                              |
-| Object storage  | S3-compatible (AWS S3 / self-hosted via MinIO)          |
-| OCR             | TBD (Tesseract, AWS Textract, or Google Document AI)    |
-| Auth            | TBD (JWT / OAuth2)                                      |
-| Linting         | ESLint 9 (flat config) + typescript-eslint              |
-| Formatting      | Prettier                                                |
-
----
-
-## Planned features
+## Features
 
 ### Receipt scanning
 
 - Upload a photo or PDF of a purchase receipt
-- OCR extracts: purchase date, retailer, product name/model, price, and payment method
-- Extracted data is editable before saving
+- OCR (Tesseract.js) extracts: purchase date, retailer, product name/model, price, and payment method
+- Extracted data is editable before saving; English and French language packs included
 
 ### Warranty tracking
 
 - Log manufacturer warranties with start date, duration, and coverage type
-- Automatic expiry alerts (configurable)
+- Automatic expiry alerts via email (configurable days-before threshold)
 - Warranty types: manufacturer, statutory (Canadian consumer law), extended/third-party, lifetime
 
 ### Product manuals & warranty documents
 
 - Upload or link product manuals and warranty PDFs
-- Global deduplication by product model: one copy shared across all users who own the same model
-- Serves as a community library — if someone else already uploaded the manual for your vacuum, you benefit automatically
+- Global deduplication by SHA-256 content hash: one copy shared across all users who own the same model
+- Community library — if someone else already uploaded the manual for your product, you benefit automatically
 
 ### Canadian consumer law context
 
-- For each product category, surface the applicable statutory warranty rights under:
-  - Federal: *Competition Act*, *Consumer Packaging and Labelling Act*
-  - Provincial: e.g., Ontario's *Consumer Protection Act*, BC's *Sale of Goods Act*, Quebec's *Consumer Protection Act* (the strongest in Canada)
-- Plain-language summaries, not legal advice
+- For each product category, surface the applicable statutory warranty rights under provincial and federal law
+- All 13 provinces/territories + federal jurisdiction seeded with plain-language summaries
+- "This is not legal advice" — summaries are for awareness only
 
 ### Consumer empowerment
 
-- "Before you buy" checklist: check if your broken product is under warranty first
+- "Before you buy new" checklist: verify warranty status before replacing a product
 - Repair vs. replace guidance based on product age and warranty status
 - Links to manufacturer service centres and right-to-repair resources
 
 ---
 
-## Warranty types (reference)
+## Warranty types
 
 | Type             | Description                                                                 |
 | ---------------- | --------------------------------------------------------------------------- |
@@ -106,8 +112,8 @@ warranty-tool/
 
 - **Node.js** >= 20
 - **Yarn** >= 1.22
-- **PostgreSQL** >= 15
-- An S3-compatible bucket (AWS S3, MinIO, Cloudflare R2, etc.)
+- **Docker** (for docker-compose local services)
+- **AWS account** (for S3 in production; local dev uses env vars pointing at any S3-compatible service)
 
 ---
 
@@ -116,21 +122,24 @@ warranty-tool/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/[your-org]/warranty-tool.git
-cd warranty-tool
+git clone https://github.com/HoukasaurusRex/fix-first.git
+cd fix-first
 ```
 
 ### 2. Install dependencies
-
-Yarn workspaces installs all dependencies for every package in a single step:
 
 ```bash
 yarn install
 ```
 
-### 3. Configure environment variables
+### 3. Start local services
 
-Copy the example env files and fill in your values:
+```bash
+yarn db:up
+# Starts PostgreSQL 15 on :5432 and MailHog on :1025 (SMTP) / :8025 (web UI)
+```
+
+### 4. Configure environment variables
 
 ```bash
 cp apps/api/.env.example apps/api/.env
@@ -139,20 +148,32 @@ cp apps/web/.env.example apps/web/.env
 
 Key variables (see each `.env.example` for the full list):
 
-| Variable           | Description                                    |
-| ------------------ | ---------------------------------------------- |
-| `DATABASE_URL`     | PostgreSQL connection string                   |
-| `S3_BUCKET`        | S3 bucket name for document storage            |
-| `S3_REGION`        | S3 region (or endpoint URL for MinIO/R2)       |
-| `JWT_SECRET`       | Secret for signing authentication tokens       |
+| Variable             | Description                                            |
+| -------------------- | ------------------------------------------------------ |
+| `DATABASE_URL`       | PostgreSQL connection string                           |
+| `JWT_ACCESS_SECRET`  | Secret for signing access tokens (15 min lifetime)     |
+| `JWT_REFRESH_SECRET` | Secret for signing refresh tokens (30 day lifetime)    |
+| `AWS_S3_BUCKET`      | S3 bucket name for receipt and document storage        |
+| `AWS_REGION`         | AWS region                                             |
+| `SMTP_HOST`          | SMTP host (`localhost` for MailHog, SES host in prod)  |
+| `SMTP_PORT`          | SMTP port (`1025` for MailHog, `587` for SES)          |
 
-### 4. Start development servers
+### 5. Run database migrations
 
 ```bash
-# API server only
+yarn workspace @fixfirst/api db:migrate
+```
+
+### 6. Start development servers
+
+```bash
+# Both API and web concurrently
+yarn dev
+
+# API only (port 3001)
 yarn dev:api
 
-# Web frontend only
+# Web frontend only (port 3000)
 yarn dev:web
 ```
 
@@ -172,35 +193,90 @@ yarn lint
 
 # Format code
 yarn format
+yarn format:check
 
 # Run a command in a specific workspace
-yarn workspace @warranty-tool/api <script>
-yarn workspace @warranty-tool/web <script>
+yarn workspace @fixfirst/api <script>
+yarn workspace @fixfirst/web <script>
+yarn workspace @fixfirst/infra <script>
+```
+
+### API database commands
+
+```bash
+yarn workspace @fixfirst/api db:migrate   # Run Prisma migrations
+yarn workspace @fixfirst/api db:generate  # Regenerate Prisma client (run after schema changes)
+yarn workspace @fixfirst/api db:seed      # Seed jurisdictions and consumer law data
+yarn workspace @fixfirst/api db:studio    # Open Prisma Studio (database GUI)
 ```
 
 ---
 
-## Database
+## Design decisions
 
-PostgreSQL is the primary data store. Migrations will be managed with a migration tool (TBD: Drizzle ORM, Prisma, or node-pg-migrate).
+### NestJS with Express adapter
 
-Core entities (planned):
+NestJS provides a structured module system, built-in dependency injection, decorator-based routing, and first-class support for Guards (auth), Interceptors, and Pipes. The default `@nestjs/platform-express` adapter is used: it has the broadest middleware ecosystem compatibility and works out of the box with `helmet`, `cookie-parser`, and `multer`.
 
-- `users` — registered consumers
-- `products` — unique product models (global, shared)
-- `user_products` — a user's owned instances of a product
-- `warranties` — warranty records linked to a user_product
-- `receipts` — scanned purchase receipts
-- `documents` — manuals, warranty PDFs (global, deduplicated by model)
-- `jurisdictions` — countries and provinces with consumer law metadata
+### Prisma ORM
+
+Prisma provides type-safe database access, a migration workflow (`prisma migrate`), and an auto-generated client that matches the schema exactly. The `schema.prisma` file is the single source of truth for data shape.
+
+### Node built-in test runner
+
+`node:test` (stable in Node 20) avoids a Jest/Vitest dependency. Test files use `tsx` as the TypeScript loader: `node --import tsx/esm --test 'src/**/*.test.ts'`.
+
+### JWT auth pattern
+
+- **Access token**: short-lived (15 min), sent in `Authorization: Bearer` header
+- **Refresh token**: long-lived (30 days), stored hashed in the database (`refresh_tokens` table), sent as an `httpOnly; Secure; SameSite=Strict` cookie
+- Rotation: each refresh issues a new refresh token and invalidates the old one
+
+### S3 object storage
+
+All uploaded files are stored in a single S3 bucket with content-addressed keys (SHA-256 hash):
+
+```text
+receipts/{userId}/{sha256}.{ext}
+documents/global/{sha256}.{ext}
+```
+
+This ensures global deduplication for product manuals — identical files are stored once regardless of how many users upload them.
+
+### AWS CDK for infrastructure
+
+All cloud resources are defined as code in `apps/infra`. Staging and production are separate CDK stacks sharing the same constructs. Secrets are in AWS Secrets Manager; no secrets in source code.
+
+### GitHub Actions CI/CD
+
+- Every PR: lint → build → test (with PostgreSQL service container)
+- Merge to `main`: auto-deploy to staging
+- Publish a `v*` git tag: deploy to production (with manual approval gate)
 
 ---
 
-## Object storage
+## Database schema
 
-All uploaded files (receipts, manuals, warranty documents) are stored in S3-compatible object storage.
+Core entities:
 
-Documents are keyed by a content hash (SHA-256) so identical files are stored only once, regardless of how many users upload the same product manual.
+- `users` — registered consumers
+- `refresh_tokens` — hashed refresh tokens with expiry and revocation tracking
+- `products` — unique product models (global, shared across all users)
+- `user_products` — a user's owned instance of a product model
+- `warranties` — warranty records linked to a user_product
+- `receipts` — scanned purchase receipts with OCR status and extracted fields
+- `documents` — manuals/warranty PDFs (global, deduplicated by SHA-256)
+- `jurisdictions` — Canadian provinces/territories with consumer law metadata
+- `jurisdiction_laws` — plain-language summaries of applicable statutes
+- `notification_prefs` — per-user email alert configuration
+
+---
+
+## MailHog (local email preview)
+
+MailHog is a local SMTP server that captures all outbound email at `localhost:1025` and displays it in a browser inbox at `http://localhost:8025`. During development, warranty expiry alert emails are sent to MailHog instead of real inboxes — no AWS SES credentials required.
+
+In production, `SMTP_HOST`/`SMTP_PORT` env vars point at AWS SES instead.
 
 ---
 
@@ -212,4 +288,4 @@ Contributions are welcome. Please open an issue before submitting a large pull r
 
 ## License
 
-MIT
+[PolyForm Shield 1.0.0](./LICENSE) — you may view, fork, and contribute to this project, but you may not use it to build a competing product or service.
