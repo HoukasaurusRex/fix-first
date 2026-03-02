@@ -13,8 +13,8 @@
     "lint": "yarn workspaces run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "dev:api": "yarn workspace @warranty-tool/api dev",
-    "dev:web": "yarn workspace @warranty-tool/web dev"
+    "dev:api": "yarn workspace @fixfirst/api dev",
+    "dev:web": "yarn workspace @fixfirst/web dev"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

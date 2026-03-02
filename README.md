@@ -1,8 +1,8 @@
-# Warranty Tool
+# FixFirst
 
-> **Know what you own. Know your rights. Repair before you replace.**
+> **Repair before you replace.**
 
-Warranty Tool is an open, consumer-empowerment platform for tracking product warranties, uploading purchase receipts, and accessing product manuals — all in one place.
+FixFirst is an open, consumer-empowerment platform for tracking product warranties, uploading purchase receipts, and accessing product manuals — all in one place.
 
 The tool scans receipts and warranty documents using OCR to extract key details (purchase date, retailer, product model, warranty terms) and stores them securely. Product manuals and warranty documents are deduplicated globally so the same PDF is never stored twice for the same model.
 

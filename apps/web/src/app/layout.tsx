@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 
 export const metadata: Metadata = {
-  title: 'Warranty Tool',
+  title: 'FixFirst',
   description:
-    'Consumer-first product warranty management — know your rights, reduce waste, repair before you replace.',
+    'Repair before you replace — track warranties, scan receipts, and know your consumer rights.',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {

@@ -1,5 +1,5 @@
 {
-  "name": "@warranty-tool/api",
+  "name": "@fixfirst/api",
   "version": "0.0.0",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "echo \"No tests yet\" && exit 0"
   },
   "dependencies": {
-    "@warranty-tool/shared-types": "*",
+    "@fixfirst/shared-types": "*",
     "fastify": "^5.0.0"
   },
   "devDependencies": {

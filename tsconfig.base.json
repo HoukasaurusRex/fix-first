@@ -16,7 +16,7 @@
     "baseUrl": ".",
     "strict": true,
     "paths": {
-      "@warranty-tool/shared-types": ["packages/shared-types/src/index.ts"]
+      "@fixfirst/shared-types": ["packages/shared-types/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp", "dist"]

@@ -1,5 +1,5 @@
 /**
- * Warranty Tool — API Server
+ * FixFirst — API Server
  *
  * Entry point for the Fastify-based REST API.
  * See README.md for architecture overview and setup instructions.
