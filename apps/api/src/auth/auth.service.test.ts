@@ -103,6 +103,43 @@ describe('AuthService', async () => {
     );
   });
 
+  test('refresh returns new tokens for a valid refresh token', async () => {
+    const storedToken = {
+      id: 'rt-1',
+      tokenHash: 'ignored-in-mock',
+      userId: 'user-1',
+      expiresAt: new Date(Date.now() + 86_400_000), // 1 day ahead
+      revokedAt: null,
+      createdAt: new Date(),
+    };
+    mocks.prisma.refreshToken.findUnique.mock.mockImplementation(() => storedToken);
+    mocks.prisma.refreshToken.update.mock.mockImplementation(() => ({}));
+    mocks.prisma.user.findUniqueOrThrow.mock.mockImplementation(() => ({
+      id: 'user-1',
+      email: 'alice@example.com',
+    }));
+    mocks.prisma.refreshToken.create.mock.mockImplementation(() => ({}));
+
+    const result = await service.refresh('some-raw-token');
+
+    assert.ok(result.accessToken);
+    assert.ok(result.refreshToken);
+    assert.equal(mocks.prisma.refreshToken.update.mock.calls.length, 1, 'old token should be revoked');
+  });
+
+  test('refresh throws UnauthorizedException for a revoked token', async () => {
+    mocks.prisma.refreshToken.findUnique.mock.mockImplementation(() => ({
+      id: 'rt-1',
+      tokenHash: 'ignored',
+      userId: 'user-1',
+      expiresAt: new Date(Date.now() + 86_400_000),
+      revokedAt: new Date(), // already revoked
+      createdAt: new Date(),
+    }));
+
+    await assert.rejects(() => service.refresh('some-raw-token'), UnauthorizedException);
+  });
+
   test('logout revokes the refresh token', async () => {
     mocks.prisma.refreshToken.updateMany.mock.mockImplementation(() => ({ count: 1 }));
 
