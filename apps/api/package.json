@@ -7,7 +7,7 @@
     "dev": "tsx watch src/main.ts",
     "start": "node dist/main.js",
     "lint": "eslint src --ext .ts",
-    "test": "node --require tsx/cjs --test 'src/**/*.test.ts'",
+    "test": "TSX_TSCONFIG_PATH=tsconfig.app.json node --require tsx/cjs --test 'src/**/*.test.ts'",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "tsx src/db/seed.ts",
@@ -15,23 +15,26 @@
   },
   "dependencies": {
     "@fixfirst/shared-types": "*",
-    "@nestjs/common": "^10.0.0",
-    "@nestjs/config": "^3.0.0",
-    "@nestjs/core": "^10.0.0",
-    "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/common": "^11.1.14",
+    "@nestjs/config": "^4.0.3",
+    "@nestjs/core": "^11.1.14",
+    "@nestjs/jwt": "^11.0.2",
+    "@nestjs/platform-express": "^11.1.14",
     "@prisma/adapter-pg": "^7.0.0",
     "@prisma/client": "^7.0.0",
-    "pg": "^8.0.0",
-    "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.0"
+    "cookie-parser": "^1.4.7",
+    "pg": "^8.19.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2"
   },
   "devDependencies": {
-    "@nestjs/testing": "^10.0.0",
-    "@types/express": "^4.17.0",
-    "@types/node": "^22.0.0",
-    "@types/pg": "^8.0.0",
-    "dotenv": "^16.0.0",
+    "@nestjs/testing": "^11.1.14",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.3.3",
+    "@types/pg": "^8.18.0",
+    "dotenv": "^17.3.1",
     "prisma": "^7.0.0",
-    "tsx": "^4.0.0"
+    "tsx": "^4.21.0"
   }
 }
