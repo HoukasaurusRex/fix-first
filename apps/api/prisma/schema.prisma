@@ -11,9 +11,183 @@ datasource db {
   provider = "postgresql"
 }
 
-// Placeholder — full schema is defined in issue #10.
-// Added so Prisma client generation works during early setup.
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum WarrantyType {
+  manufacturer
+  statutory
+  extended
+  lifetime
+}
+
+enum OcrStatus {
+  pending
+  processing
+  completed
+  failed
+}
+
+enum DocumentType {
+  manual
+  warranty_certificate
+  other
+}
+
+// ---------------------------------------------------------------------------
+// Users & Auth
+// ---------------------------------------------------------------------------
+
 model User {
   id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  refreshTokens    RefreshToken[]
+  userProducts     UserProduct[]
+  receipts         Receipt[]
+  notificationPref NotificationPref?
+}
+
+model RefreshToken {
+  id        String    @id @default(cuid())
+  tokenHash String    @unique
+  userId    String
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Products
+// ---------------------------------------------------------------------------
+
+model Product {
+  id        String   @id @default(cuid())
+  brand     String
+  model     String
+  category  String
+  createdAt DateTime @default(now())
+
+  userProducts UserProduct[]
+  documents    Document[]
+
+  @@unique([brand, model])
+}
+
+model UserProduct {
+  id          String    @id @default(cuid())
+  userId      String
+  productId   String
+  purchasedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product    Product     @relation(fields: [productId], references: [id])
+  warranties Warranty[]
+  receipts   Receipt[]
+}
+
+// ---------------------------------------------------------------------------
+// Warranties
+// ---------------------------------------------------------------------------
+
+model Warranty {
+  id            String       @id @default(cuid())
+  userProductId String
+  type          WarrantyType
+  startDate     DateTime
+  endDate       DateTime?
+  provider      String?
+  notes         String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  userProduct UserProduct @relation(fields: [userProductId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Receipts
+// ---------------------------------------------------------------------------
+
+model Receipt {
+  id            String    @id @default(cuid())
+  userId        String
+  userProductId String?
+  s3Key         String    @unique
+  ocrStatus     OcrStatus @default(pending)
+  retailer      String?
+  purchasedAt   DateTime?
+  price         Decimal?  @db.Decimal(10, 2)
+  currency      String?   @default("CAD")
+  rawText       String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userProduct UserProduct? @relation(fields: [userProductId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Documents (manuals, warranty PDFs — global deduplication by SHA-256)
+// ---------------------------------------------------------------------------
+
+model Document {
+  id           String       @id @default(cuid())
+  productId    String?
+  sha256       String       @unique
+  s3Key        String       @unique
+  type         DocumentType @default(manual)
+  filename     String
+  sizeBytes    Int
+  uploadedById String?
+  createdAt    DateTime     @default(now())
+
+  product Product? @relation(fields: [productId], references: [id])
+}
+
+// ---------------------------------------------------------------------------
+// Canadian Consumer Law
+// ---------------------------------------------------------------------------
+
+model Jurisdiction {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  name         String
+  country      String   @default("CA")
+  isProvincial Boolean  @default(true)
+  createdAt    DateTime @default(now())
+
+  laws JurisdictionLaw[]
+}
+
+model JurisdictionLaw {
+  id              String    @id @default(cuid())
+  jurisdictionId  String
+  statute         String
+  summary         String
+  productCategory String?
+  effectiveDate   DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  jurisdiction Jurisdiction @relation(fields: [jurisdictionId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Notification preferences
+// ---------------------------------------------------------------------------
+
+model NotificationPref {
+  id               String  @id @default(cuid())
+  userId           String  @unique
+  emailEnabled     Boolean @default(true)
+  daysBeforeExpiry Int     @default(30)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
