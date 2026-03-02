@@ -13,8 +13,11 @@
     "lint": "yarn workspaces run lint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "dev": "yarn dev:api & yarn dev:web",
     "dev:api": "yarn workspace @fixfirst/api dev",
-    "dev:web": "yarn workspace @fixfirst/web dev"
+    "dev:web": "yarn workspace @fixfirst/web dev",
+    "db:up": "docker-compose up -d",
+    "db:down": "docker-compose down"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
