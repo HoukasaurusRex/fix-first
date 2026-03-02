@@ -25,5 +25,4 @@
  *    - Country, Province, ConsumerLaw
  */
 
-// Placeholder — types will be added as the API and data model are designed.
-export {};
+export type { AuthResponse, AuthUser, JwtPayload } from './auth';
