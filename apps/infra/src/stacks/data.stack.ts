@@ -80,6 +80,7 @@ export class DataStack extends Stack {
             ? ['https://fixfirst.ca']
             : ['http://localhost:3000', 'https://staging.fixfirst.ca'],
           allowedHeaders: ['*'],
+          exposedHeaders: ['ETag'],
         },
       ],
     });
