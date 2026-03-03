@@ -2,8 +2,8 @@ name: Deploy — Production
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
 
 permissions:
   id-token: write   # Required for OIDC
@@ -51,7 +51,7 @@ jobs:
         id: tags
         run: |
           ECR_REGISTRY="${{ steps.ecr-login.outputs.registry }}"
-          TAG="${GITHUB_REF_NAME}"  # e.g. v1.0.0
+          TAG="${GITHUB_SHA::7}"
           echo "api_image=${ECR_REGISTRY}/fixfirst-api-production:${TAG}" >> "$GITHUB_OUTPUT"
           echo "api_image_latest=${ECR_REGISTRY}/fixfirst-api-production:latest" >> "$GITHUB_OUTPUT"
           echo "web_image=${ECR_REGISTRY}/fixfirst-web-production:${TAG}" >> "$GITHUB_OUTPUT"
@@ -113,7 +113,7 @@ jobs:
 
       - name: Output deployed URLs
         run: |
-          echo "### Production Deploy Complete — ${{ github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Production Deploy Complete — ${GITHUB_SHA::7}" >> "$GITHUB_STEP_SUMMARY"
           echo "- API: https://api.fixfirst.ca/api/v1/health" >> "$GITHUB_STEP_SUMMARY"
           echo "- Web: https://fixfirst.ca" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Tag: ${{ github.ref_name }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: ${{ github.sha }}" >> "$GITHUB_STEP_SUMMARY"

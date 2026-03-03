@@ -1,5 +1,7 @@
 # FixFirst
 
+[![Deploy — Production](https://github.com/HoukasaurusRex/fix-first/actions/workflows/deploy-prod.yml/badge.svg)](https://github.com/HoukasaurusRex/fix-first/actions/workflows/deploy-prod.yml)
+
 > **Repair before you replace.**
 
 FixFirst is an open, consumer-empowerment platform for tracking product warranties, uploading purchase receipts, and accessing product manuals — all in one place.
@@ -250,8 +252,7 @@ All cloud resources are defined as code in `apps/infra`. Staging and production 
 ### GitHub Actions CI/CD
 
 - Every PR: lint → build → test (with PostgreSQL service container)
-- Merge to `main`: auto-deploy to staging
-- Publish a `v*` git tag: deploy to production (with manual approval gate)
+- Merge to `main`: auto-deploy to production (with manual approval gate)
 
 ---
 
