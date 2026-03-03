@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { JurisdictionsModule } from './jurisdictions/jurisdictions.module';
+import { GuidanceModule } from './guidance/guidance.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { OcrModule } from './ocr/ocr.module';
 import { PrismaModule } from './prisma/prisma.module';
@@ -28,6 +29,7 @@ import { WarrantiesModule } from './warranties/warranties.module';
     ReceiptsModule,
     JurisdictionsModule,
     NotificationsModule,
+    GuidanceModule,
   ],
 })
 export class AppModule {}
