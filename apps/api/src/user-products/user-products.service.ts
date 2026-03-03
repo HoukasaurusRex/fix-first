@@ -1,4 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { JurisdictionsService } from '../jurisdictions/jurisdictions.service';
 import { PrismaService } from '../prisma/prisma.service';
 import type { CreateUserProductDto } from './dto/create-user-product.dto';
 import type { UpdateUserProductDto } from './dto/update-user-product.dto';
@@ -10,7 +11,10 @@ const INCLUDE = {
 
 @Injectable()
 export class UserProductsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jurisdictions: JurisdictionsService,
+  ) {}
 
   list(userId: string) {
     return this.prisma.userProduct.findMany({
@@ -22,7 +26,7 @@ export class UserProductsService {
 
   async create(userId: string, dto: CreateUserProductDto) {
     const { productId, purchasedAt, retailer, price } = dto;
-    return this.prisma.userProduct.create({
+    const userProduct = await this.prisma.userProduct.create({
       data: {
         userId,
         productId,
@@ -32,6 +36,10 @@ export class UserProductsService {
       },
       include: INCLUDE,
     });
+
+    await this.maybeCreateStatutoryWarranty(userId, userProduct);
+
+    return this.prisma.userProduct.findUnique({ where: { id: userProduct.id }, include: INCLUDE })!;
   }
 
   async update(userId: string, id: string, dto: UpdateUserProductDto) {
@@ -52,6 +60,33 @@ export class UserProductsService {
   async remove(userId: string, id: string) {
     await this.assertOwner(userId, id);
     await this.prisma.userProduct.delete({ where: { id } });
+  }
+
+  private async maybeCreateStatutoryWarranty(
+    userId: string,
+    userProduct: { id: string; purchasedAt: Date | null; product: { category: string } },
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { province: true },
+    });
+    if (!user?.province) return;
+
+    const { laws } = await this.jurisdictions
+      .findApplicableLaws(user.province, userProduct.product.category)
+      .catch(() => ({ laws: [] }));
+
+    if (laws.length === 0) return;
+
+    const statutes = laws.map((l) => l.statute).join('; ');
+    await this.prisma.warranty.create({
+      data: {
+        userProductId: userProduct.id,
+        type: 'statutory',
+        startDate: userProduct.purchasedAt ?? new Date(),
+        notes: `Statutory rights under: ${statutes}`,
+      },
+    });
   }
 
   private async assertOwner(userId: string, id: string) {
