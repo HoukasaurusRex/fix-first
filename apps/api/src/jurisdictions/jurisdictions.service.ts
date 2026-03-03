@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 
 const FEDERAL_CODE = 'CA';
@@ -16,7 +16,7 @@ export class JurisdictionsService {
       where: { code: code.toUpperCase() },
       include: { laws: true },
     });
-    if (!provincial) throw new NotFoundException(`Jurisdiction not found: ${code}`);
+    if (!provincial) return { jurisdiction: { code: code.toUpperCase(), name: 'Unknown' }, laws: [] };
 
     const federal = await this.prisma.jurisdiction.findUnique({
       where: { code: FEDERAL_CODE },
