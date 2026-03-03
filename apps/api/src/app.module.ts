@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { LoggerModule } from 'nestjs-pino';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
 import { JurisdictionsModule } from './jurisdictions/jurisdictions.module';
@@ -17,9 +20,24 @@ import { WarrantiesModule } from './warranties/warranties.module';
 
 @Module({
   controllers: [HealthController],
+  providers: [
+    // Apply global rate limit: 100 requests per 60 seconds per IP.
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
     ScheduleModule.forRoot(),
+    ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
+    LoggerModule.forRoot({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      pinoHttp: {
+        ...(process.env.NODE_ENV !== 'production' && {
+          transport: { target: 'pino-pretty', options: { singleLine: true } },
+        }),
+        level: process.env.LOG_LEVEL ?? 'info',
+        redact: ['req.headers.authorization', 'req.headers.cookie'],
+      } as any,
+    }),
     PrismaModule,
     AuthModule,
     UsersModule,

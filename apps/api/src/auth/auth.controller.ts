@@ -10,6 +10,7 @@ import {
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
@@ -25,6 +26,7 @@ const COOKIE_OPTIONS = {
   maxAge: 30 * 24 * 60 * 60 * 1000,
 };
 
+@Throttle({ default: { ttl: 60_000, limit: 10 } }) // 10 req/min on all auth routes
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
