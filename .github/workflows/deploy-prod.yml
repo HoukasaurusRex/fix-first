@@ -8,18 +8,75 @@ on:
 permissions:
   id-token: write   # Required for OIDC
   contents: read
+  issues: write     # Required for manual-approval action to create/close approval issue
 
 env:
   AWS_REGION: ca-central-1
   DEPLOY_ENV: production
 
 jobs:
+  test:
+    name: Lint, build, and test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: fixfirst
+          POSTGRES_PASSWORD: fixfirst
+          POSTGRES_DB: fixfirst
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U fixfirst"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://fixfirst:fixfirst@localhost:5432/fixfirst
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Format check
+        run: yarn format:check
+
+      - name: Build
+        run: yarn build
+
+      - name: Generate Prisma client
+        run: yarn workspace @fixfirst/api db:generate
+
+      - name: Test
+        run: yarn test
+
   approve:
     name: Manual approval gate
     runs-on: ubuntu-latest
-    environment: production  # Requires a reviewer configured in GitHub Settings → Environments
+    needs: test
     steps:
-      - run: echo "Production deploy approved for ${{ github.ref_name }}"
+      - uses: trstringer/manual-approval@v1
+        with:
+          secret: ${{ secrets.GITHUB_TOKEN }}
+          approvers: HoukasaurusRex
+          minimum-approvals: 1
+          issue-title: "Deploy to production: ${{ github.sha }}"
+          issue-body: |
+            Tests passed. Approve this issue to deploy commit `${{ github.sha }}` to production.
+            Comment **approved** to proceed or **denied** to cancel.
 
   deploy:
     name: Build, migrate, and deploy to production
