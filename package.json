@@ -17,12 +17,19 @@
     "dev:api": "yarn workspace @fixfirst/api dev",
     "dev:web": "yarn workspace @fixfirst/web dev",
     "db:up": "docker-compose up -d",
-    "db:down": "docker-compose down"
+    "db:down": "docker-compose down",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.{ts,tsx}": "eslint --fix",
+    "**/*.{ts,tsx,js,json,md,yml,yaml}": "prettier --write"
   },
   "devDependencies": {
     "@types/node": "^25.3.3",
     "concurrently": "^9.2.1",
     "eslint": "^10.0.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.1",
     "prettier": "^3.8.1",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1"
