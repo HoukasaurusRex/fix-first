@@ -71,6 +71,8 @@ function DashboardContent() {
       </header>
 
       <Link href="/products/new">+ Add product</Link>
+      {' · '}
+      <Link href="/documents">Document library</Link>
 
       {loading && <p>Loading…</p>}
       {error && <p role="alert">{error}</p>}
