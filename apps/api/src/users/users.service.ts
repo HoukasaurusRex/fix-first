@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import type { UpdateNotificationPrefsDto } from './dto/update-notification-prefs.dto';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
 
 const VALID_PROVINCES = new Set([
@@ -39,5 +40,20 @@ export class UsersService {
     if (dto.province !== undefined) data.province = dto.province.toUpperCase();
 
     return this.prisma.user.update({ where: { id }, data, select: USER_SELECT });
+  }
+
+  async updateNotificationPrefs(userId: string, dto: UpdateNotificationPrefsDto) {
+    return this.prisma.notificationPref.upsert({
+      where: { userId },
+      update: {
+        ...(dto.emailEnabled !== undefined && { emailEnabled: dto.emailEnabled }),
+        ...(dto.daysBeforeExpiry !== undefined && { daysBeforeExpiry: dto.daysBeforeExpiry }),
+      },
+      create: {
+        userId,
+        emailEnabled: dto.emailEnabled ?? true,
+        daysBeforeExpiry: dto.daysBeforeExpiry ?? 30,
+      },
+    });
   }
 }
