@@ -1,12 +1,11 @@
-import nx from '@nx/eslint-plugin';
+// @ts-check
+import tsEslint from 'typescript-eslint';
 
-export default [
-  ...nx.configs['flat/base'],
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/react'],
+export default tsEslint.config(
   {
     ignores: ['**/dist/**', '**/node_modules/**', '**/.next/**', '**/coverage/**'],
   },
+  ...tsEslint.configs.recommended,
   {
     files: ['**/*.ts', '**/*.tsx'],
     rules: {
@@ -16,6 +15,10 @@ export default [
         'error',
         { prefer: 'type-imports' },
       ],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
     },
   },
   {
@@ -24,4 +27,4 @@ export default [
       '@typescript-eslint/no-explicit-any': 'off',
     },
   },
-];
+);
