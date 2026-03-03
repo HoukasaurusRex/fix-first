@@ -1,8 +1,7 @@
 import { App } from 'aws-cdk-lib';
 import type { DeployEnv } from './types';
 import { NetworkStack } from './stacks/network.stack';
-import { DatabaseStack } from './stacks/database.stack';
-import { StorageStack } from './stacks/storage.stack';
+import { DataStack } from './stacks/data.stack';
 import { ApiStack } from './stacks/api.stack';
 import { WebStack } from './stacks/web.stack';
 
@@ -21,8 +20,12 @@ const stackProps = { env: awsEnv, deployEnv };
 
 // Each stack is named FixFirst-{Name}-{env} for clear environment separation.
 const networkStack = new NetworkStack(app, `FixFirst-Network-${deployEnv}`, stackProps);
-new DatabaseStack(app, `FixFirst-Database-${deployEnv}`, stackProps);
-new StorageStack(app, `FixFirst-Storage-${deployEnv}`, stackProps);
+const dataStack = new DataStack(app, `FixFirst-Data-${deployEnv}`, {
+  ...stackProps,
+  vpc: networkStack.vpc,
+  dbSg: networkStack.dbSg,
+});
+dataStack.addDependency(networkStack);
 new ApiStack(app, `FixFirst-Api-${deployEnv}`, stackProps);
 new WebStack(app, `FixFirst-Web-${deployEnv}`, stackProps);
 
