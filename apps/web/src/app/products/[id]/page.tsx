@@ -213,6 +213,8 @@ function ProductDetailContent() {
   return (
     <main>
       <Link href="/dashboard">← Back to dashboard</Link>
+      {' · '}
+      <Link href={`/products/${id}/guidance`}>Guidance tool</Link>
       <h1>{product.brand} {product.model}</h1>
       <p>{product.category}</p>
       {userProduct.retailer && <p>Purchased at {userProduct.retailer}</p>}
