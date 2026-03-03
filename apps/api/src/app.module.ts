@@ -8,6 +8,7 @@ import { ReceiptsModule } from './receipts/receipts.module';
 import { StorageModule } from './storage/storage.module';
 import { UserProductsModule } from './user-products/user-products.module';
 import { UsersModule } from './users/users.module';
+import { JurisdictionsModule } from './jurisdictions/jurisdictions.module';
 import { WarrantiesModule } from './warranties/warranties.module';
 
 @Module({
@@ -22,6 +23,7 @@ import { WarrantiesModule } from './warranties/warranties.module';
     StorageModule,
     OcrModule,
     ReceiptsModule,
+    JurisdictionsModule,
   ],
 })
 export class AppModule {}
