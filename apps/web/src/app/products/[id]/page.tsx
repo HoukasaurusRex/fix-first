@@ -5,6 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ProtectedRoute } from '../../../components/protected-route';
 import { useApi } from '../../../hooks/use-api';
+import { useAuth } from '../../../context/auth';
 import type { UserProductDetail, WarrantyType } from '@fixfirst/shared-types';
 
 const WARRANTY_TYPES: { value: WarrantyType; label: string; tooltip: string }[] = [
@@ -30,6 +31,28 @@ const WARRANTY_TYPES: { value: WarrantyType; label: string; tooltip: string }[] 
   },
 ];
 
+// Best-effort official act URL mapping keyed by jurisdiction code
+const STATUTE_URLS: Record<string, string> = {
+  CA: 'https://laws-lois.justice.gc.ca/eng/acts/',
+  ON: 'https://www.ontario.ca/laws/statute/02c30',
+  QC: 'https://www.legisquebec.gouv.qc.ca/en/document/cs/p-40.1',
+  BC: 'https://www.bclaws.gov.bc.ca/civix/document/id/complete/statreg/04002_01',
+  AB: 'https://www.qp.alberta.ca/documents/Acts/C26P3.pdf',
+  MB: 'https://web2.gov.mb.ca/laws/statutes/ccsm/c200e.php',
+  SK: 'https://www.qp.gov.sk.ca/documents/English/Statutes/Statutes/C30-2.pdf',
+  NS: 'https://nslegislature.ca/sites/default/files/legc/statutes/consumer%20protection.htm',
+  NB: 'https://www.snb.ca/e/bills/index-e.asp',
+  PE: 'https://www.princeedwardisland.ca/en/legislation/consumer-protection-act',
+  NL: 'https://assembly.nl.ca/legislation/sr/statutes/c31-1.htm',
+  NT: 'https://www.justice.gov.nt.ca/en/files/legislation/sale-of-goods/sale-of-goods.a.pdf',
+  NU: 'https://www.nunavutlegislation.ca/',
+  YT: 'https://legislation.yukon.ca/acts/sa.pdf',
+};
+
+function statuteUrl(jurisdictionCode: string): string {
+  return STATUTE_URLS[jurisdictionCode] ?? `https://www.google.com/search?q=${encodeURIComponent(jurisdictionCode + ' consumer protection act')}`;
+}
+
 function statusBadge(type: WarrantyType, endDate: string | null): { label: string; color: string } {
   if (type === 'lifetime') return { label: 'Lifetime', color: '#22c55e' };
   if (type === 'statutory') return { label: 'Statutory (no fixed expiry)', color: '#6366f1' };
@@ -38,16 +61,101 @@ function statusBadge(type: WarrantyType, endDate: string | null): { label: strin
   if (msLeft <= 0) return { label: 'Expired', color: '#ef4444' };
   const days = Math.ceil(msLeft / (24 * 60 * 60 * 1000));
   if (days <= 30)
-    return {
-      label: `Expiring in ${days}d`,
-      color: '#f59e0b',
-    };
+    return { label: `Expiring in ${days}d`, color: '#f59e0b' };
   return { label: `Active (${Math.ceil(days / 30)}mo left)`, color: '#22c55e' };
+}
+
+type LawEntry = {
+  id: string;
+  jurisdictionId: string;
+  statute: string;
+  summary: string;
+  productCategory: string | null;
+};
+
+type ApplicableLawsResponse = {
+  jurisdiction: { code: string; name: string };
+  laws: LawEntry[];
+};
+
+function StatutoryRightsPanel({
+  province,
+  category,
+}: {
+  province: string | null | undefined;
+  category: string;
+}) {
+  const { request } = useApi();
+  const [data, setData] = useState<ApplicableLawsResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!province) return;
+    setLoading(true);
+    request<ApplicableLawsResponse>(
+      `/jurisdictions/${province}/laws?category=${encodeURIComponent(category)}`,
+    )
+      .then(setData)
+      .catch(() => null)
+      .finally(() => setLoading(false));
+  }, [province, category, request]);
+
+  if (!province) {
+    return (
+      <section style={{ background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px', padding: '1rem', marginTop: '1.5rem' }}>
+        <h2>Your Statutory Rights</h2>
+        <p>
+          Set your <Link href="/account">province in account settings</Link> to see the consumer
+          protection laws that apply to this product in your jurisdiction.
+        </p>
+      </section>
+    );
+  }
+
+  if (loading) {
+    return (
+      <section style={{ marginTop: '1.5rem' }}>
+        <h2>Your Statutory Rights</h2>
+        <p>Loading applicable laws…</p>
+      </section>
+    );
+  }
+
+  if (!data || data.laws.length === 0) {
+    return null;
+  }
+
+  return (
+    <section style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px', padding: '1rem', marginTop: '1.5rem' }}>
+      <h2>Your Statutory Rights — {data.jurisdiction.name}</h2>
+      <p style={{ fontSize: '0.8rem', color: '#6b7280', fontStyle: 'italic' }}>
+        This information is for educational purposes only and is not legal advice. For legal
+        questions, consult a qualified lawyer or your provincial consumer protection office.
+      </p>
+      <ul style={{ listStyle: 'none', padding: 0 }}>
+        {data.laws.map((law) => (
+          <li key={law.id} style={{ marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid #dbeafe' }}>
+            <strong>{law.statute}</strong>
+            <p style={{ margin: '0.25rem 0', color: '#374151' }}>{law.summary}</p>
+            <a
+              href={statuteUrl(data.jurisdiction.code)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ fontSize: '0.85rem', color: '#2563eb' }}
+            >
+              View official act text →
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
 }
 
 function ProductDetailContent() {
   const { id } = useParams<{ id: string }>();
   const { request } = useApi();
+  const { user } = useAuth();
   const router = useRouter();
 
   const [userProduct, setUserProduct] = useState<UserProductDetail | null>(null);
@@ -129,6 +237,11 @@ function ProductDetailContent() {
           })}
         </ul>
       )}
+
+      <StatutoryRightsPanel
+        province={(user as any)?.province}
+        category={product.category}
+      />
 
       <h2>Add warranty</h2>
       <form onSubmit={handleAddWarranty}>
