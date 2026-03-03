@@ -62,6 +62,8 @@ function DashboardContent() {
         <div>
           <span>{user?.name ?? user?.email}</span>
           {' · '}
+          <Link href="/account">Settings</Link>
+          {' · '}
           <button onClick={logout}>Sign out</button>
         </div>
       </header>
