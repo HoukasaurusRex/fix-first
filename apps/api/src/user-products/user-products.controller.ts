@@ -14,9 +14,9 @@ import {
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt-auth.guard';
-import { CreateUserProductDto } from './dto/create-user-product.dto';
-import { UpdateUserProductDto } from './dto/update-user-product.dto';
-import { UserProductsService } from './user-products.service';
+import type { CreateUserProductDto } from './dto/create-user-product.dto';
+import type { UpdateUserProductDto } from './dto/update-user-product.dto';
+import type { UserProductsService } from './user-products.service';
 
 @Controller('user-products')
 @UseGuards(JwtAuthGuard)

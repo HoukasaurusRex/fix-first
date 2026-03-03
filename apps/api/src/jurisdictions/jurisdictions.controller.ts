@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { JurisdictionsService } from './jurisdictions.service';
+import type { JurisdictionsService } from './jurisdictions.service';
 
 @Controller('jurisdictions')
 export class JurisdictionsController {

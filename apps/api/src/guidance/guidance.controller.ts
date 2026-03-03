@@ -2,7 +2,7 @@ import { Controller, Get, Param, Query, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt-auth.guard';
-import { GuidanceService } from './guidance.service';
+import type { GuidanceService } from './guidance.service';
 
 @Controller('guidance')
 @UseGuards(JwtAuthGuard)

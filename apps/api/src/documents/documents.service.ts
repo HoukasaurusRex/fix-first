@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
+import type { PrismaService } from '../prisma/prisma.service';
+import type { StorageService } from '../storage/storage.service';
 import type { ConfirmUploadDto } from './dto/confirm-upload.dto';
 import type { DocumentSummary } from '@fixfirst/shared-types';
 

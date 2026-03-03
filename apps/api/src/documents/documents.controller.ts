@@ -1,9 +1,9 @@
 import { Body, Controller, Get, Param, Post, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { DocumentsService } from './documents.service';
-import { CheckDocumentDto } from './dto/check-document.dto';
-import { ConfirmUploadDto } from './dto/confirm-upload.dto';
+import type { DocumentsService } from './documents.service';
+import type { CheckDocumentDto } from './dto/check-document.dto';
+import type { ConfirmUploadDto } from './dto/confirm-upload.dto';
 
 @UseGuards(JwtAuthGuard)
 @Controller('documents')

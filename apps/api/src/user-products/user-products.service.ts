@@ -1,6 +1,6 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import { JurisdictionsService } from '../jurisdictions/jurisdictions.service';
-import { PrismaService } from '../prisma/prisma.service';
+import type { JurisdictionsService } from '../jurisdictions/jurisdictions.service';
+import type { PrismaService } from '../prisma/prisma.service';
 import type { CreateUserProductDto } from './dto/create-user-product.dto';
 import type { UpdateUserProductDto } from './dto/update-user-product.dto';
 

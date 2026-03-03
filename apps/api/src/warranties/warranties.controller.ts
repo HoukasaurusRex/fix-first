@@ -2,8 +2,8 @@ import { Body, Controller, Get, Param, Post, Query, Req, UseGuards } from '@nest
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt-auth.guard';
-import { CreateWarrantyDto } from './dto/create-warranty.dto';
-import { WarrantiesService } from './warranties.service';
+import type { CreateWarrantyDto } from './dto/create-warranty.dto';
+import type { WarrantiesService } from './warranties.service';
 
 @Controller()
 @UseGuards(JwtAuthGuard)

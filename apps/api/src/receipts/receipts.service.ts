@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { OcrService } from '../ocr/ocr.service';
-import { PrismaService } from '../prisma/prisma.service';
-import { StorageService } from '../storage/storage.service';
+import type { OcrService } from '../ocr/ocr.service';
+import type { PrismaService } from '../prisma/prisma.service';
+import type { StorageService } from '../storage/storage.service';
 import type { RequestUploadUrlDto } from './dto/request-upload-url.dto';
 import type { UpdateReceiptDto } from './dto/update-receipt.dto';
 

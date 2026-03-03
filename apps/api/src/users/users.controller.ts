@@ -2,9 +2,9 @@ import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt-auth.guard';
-import { UpdateNotificationPrefsDto } from './dto/update-notification-prefs.dto';
-import { UpdateProfileDto } from './dto/update-profile.dto';
-import { UsersService } from './users.service';
+import type { UpdateNotificationPrefsDto } from './dto/update-notification-prefs.dto';
+import type { UpdateProfileDto } from './dto/update-profile.dto';
+import type { UsersService } from './users.service';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)

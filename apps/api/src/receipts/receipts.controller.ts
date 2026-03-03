@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Patch, Post, Req, UseGuards } from '@nest
 import type { Request } from 'express';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import type { JwtPayload } from '../auth/jwt-auth.guard';
-import { RequestUploadUrlDto } from './dto/request-upload-url.dto';
-import { UpdateReceiptDto } from './dto/update-receipt.dto';
-import { ReceiptsService } from './receipts.service';
+import type { RequestUploadUrlDto } from './dto/request-upload-url.dto';
+import type { UpdateReceiptDto } from './dto/update-receipt.dto';
+import type { ReceiptsService } from './receipts.service';
 
 @Controller('receipts')
 @UseGuards(JwtAuthGuard)

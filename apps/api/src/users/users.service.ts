@@ -1,5 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import type { PrismaService } from '../prisma/prisma.service';
 import type { UpdateNotificationPrefsDto } from './dto/update-notification-prefs.dto';
 import type { UpdateProfileDto } from './dto/update-profile.dto';
 

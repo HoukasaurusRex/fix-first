@@ -30,7 +30,7 @@ import { WarrantiesModule } from './warranties/warranties.module';
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 100 }]),
     LoggerModule.forRoot({
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+       
       pinoHttp: {
         ...(process.env.NODE_ENV !== 'production' && {
           transport: { target: 'pino-pretty', options: { singleLine: true } },
