@@ -8,12 +8,16 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { DocumentsService } from '../documents/documents.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { ProductsService } from './products.service';
 
 @Controller('products')
 export class ProductsController {
-  constructor(private readonly products: ProductsService) {}
+  constructor(
+    private readonly products: ProductsService,
+    private readonly documents: DocumentsService,
+  ) {}
 
   @Get()
   list(
@@ -44,6 +48,11 @@ export class ProductsController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.products.findById(id);
+  }
+
+  @Get(':id/documents')
+  listDocuments(@Param('id') id: string) {
+    return this.documents.findForProduct(id);
   }
 
   @Post()

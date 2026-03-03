@@ -16,7 +16,8 @@ export class ReceiptsService {
   ) {}
 
   async requestUploadUrl(userId: string, dto: RequestUploadUrlDto) {
-    const s3Key = this.storage.receiptKey(userId, dto.sha256, dto.ext);
+    const ext = dto.filename.split('.').pop() ?? 'bin';
+    const s3Key = this.storage.receiptKey(userId, dto.sha256, ext);
 
     const receipt = await this.prisma.receipt.create({
       data: { userId, s3Key },

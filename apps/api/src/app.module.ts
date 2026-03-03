@@ -6,6 +6,7 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { LoggerModule } from 'nestjs-pino';
 import { HealthController } from './health/health.controller';
 import { AuthModule } from './auth/auth.module';
+import { DocumentsModule } from './documents/documents.module';
 import { JurisdictionsModule } from './jurisdictions/jurisdictions.module';
 import { GuidanceModule } from './guidance/guidance.module';
 import { NotificationsModule } from './notifications/notifications.module';
@@ -42,6 +43,7 @@ import { WarrantiesModule } from './warranties/warranties.module';
     AuthModule,
     UsersModule,
     ProductsModule,
+    DocumentsModule,
     UserProductsModule,
     WarrantiesModule,
     StorageModule,
