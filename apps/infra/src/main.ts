@@ -48,6 +48,21 @@ const apiStack = new ApiStack(app, `FixFirst-Api-${deployEnv}`, {
   certificateArn,
 });
 apiStack.addDependency(sharedStack);
-new WebStack(app, `FixFirst-Web-${deployEnv}`, stackProps);
+
+const apiAlbDns = apiStack.fargateService.cluster.clusterName; // placeholder — real URL is post-deploy
+const apiUrl =
+  deployEnv === 'production'
+    ? 'https://api.fixfirst.ca/api/v1'
+    : 'https://staging-api.fixfirst.ca/api/v1';
+
+const webStack = new WebStack(app, `FixFirst-Web-${deployEnv}`, {
+  ...stackProps,
+  vpc: networkStack.vpc,
+  albSg: networkStack.albSg,
+  ecsTaskRole: sharedStack.ecsTaskRole,
+  apiUrl,
+});
+webStack.addDependency(sharedStack);
+void apiAlbDns; // referenced to preserve compile-time check
 
 app.synth();
