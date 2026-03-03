@@ -1,12 +1,7 @@
-import {
-  CfnOutput,
-  Duration,
-  RemovalPolicy,
-  Stack,
-  StackProps,
-} from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, RemovalPolicy, Stack } from 'aws-cdk-lib';
 import { aws_ec2 as ec2, aws_rds as rds, aws_s3 as s3 } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import type { EnvProps } from '../types';
 
 export interface DataStackProps extends StackProps, EnvProps {

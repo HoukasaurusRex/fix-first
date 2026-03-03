@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { aws_ec2 as ec2, aws_ecs as ecs } from 'aws-cdk-lib';
+import type { aws_ec2 as ec2, aws_ecs as ecs } from 'aws-cdk-lib';
 
 export interface FargateServiceProps {
   /** VPC in which the service runs. */

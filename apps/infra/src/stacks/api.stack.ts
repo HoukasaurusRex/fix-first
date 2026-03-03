@@ -1,14 +1,14 @@
-import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import type { aws_iam as iam, aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
 import {
   aws_certificatemanager as acm,
   aws_ec2 as ec2,
   aws_ecr as ecr,
   aws_ecs as ecs,
   aws_elasticloadbalancingv2 as elbv2,
-  aws_iam as iam,
-  aws_secretsmanager as secretsmanager,
 } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import type { EnvProps } from '../types';
 
 export interface ApiStackProps extends StackProps, EnvProps {
@@ -29,16 +29,15 @@ export class ApiStack extends Stack {
   constructor(scope: Construct, id: string, props: ApiStackProps) {
     super(scope, id, props);
 
-    const { deployEnv, vpc, albSg, apiSg, ecsTaskRole, appSecret, dbSecret, certificateArn } = props;
+    const { deployEnv, vpc, albSg, apiSg, ecsTaskRole, appSecret, dbSecret, certificateArn } =
+      props;
     const isProduction = deployEnv === 'production';
 
     // ── ECR Repository ────────────────────────────────────────────────────────
     this.ecrRepo = new ecr.Repository(this, 'ApiRepo', {
       repositoryName: `fixfirst-api-${deployEnv}`,
       imageScanOnPush: true,
-      lifecycleRules: [
-        { maxImageCount: 10, description: 'Retain last 10 images' },
-      ],
+      lifecycleRules: [{ maxImageCount: 10, description: 'Retain last 10 images' }],
     });
 
     // ── ECS Cluster ───────────────────────────────────────────────────────────

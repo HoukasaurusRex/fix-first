@@ -1,6 +1,7 @@
-import { CfnOutput, Stack, StackProps } from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Stack } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import type { EnvProps } from '../types';
 
 export interface NetworkStackProps extends StackProps, EnvProps {}
@@ -72,8 +73,14 @@ export class NetworkStack extends Stack {
 
     // Export identifiers for cross-stack references.
     new CfnOutput(this, 'VpcId', { value: this.vpc.vpcId, exportName: `${id}-VpcId` });
-    new CfnOutput(this, 'AlbSgId', { value: this.albSg.securityGroupId, exportName: `${id}-AlbSgId` });
-    new CfnOutput(this, 'ApiSgId', { value: this.apiSg.securityGroupId, exportName: `${id}-ApiSgId` });
+    new CfnOutput(this, 'AlbSgId', {
+      value: this.albSg.securityGroupId,
+      exportName: `${id}-AlbSgId`,
+    });
+    new CfnOutput(this, 'ApiSgId', {
+      value: this.apiSg.securityGroupId,
+      exportName: `${id}-ApiSgId`,
+    });
     new CfnOutput(this, 'DbSgId', { value: this.dbSg.securityGroupId, exportName: `${id}-DbSgId` });
   }
 }

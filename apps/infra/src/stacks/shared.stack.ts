@@ -1,9 +1,7 @@
-import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
-import {
-  aws_iam as iam,
-  aws_secretsmanager as secretsmanager,
-} from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import type { StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import { aws_iam as iam, aws_secretsmanager as secretsmanager } from 'aws-cdk-lib';
+import type { Construct } from 'constructs';
 import type { EnvProps } from '../types';
 
 const GITHUB_REPO = 'HoukasaurusRex/fix-first';

@@ -1,4 +1,6 @@
-import { CfnOutput, Duration, Stack, StackProps } from 'aws-cdk-lib';
+import type { StackProps } from 'aws-cdk-lib';
+import { CfnOutput, Duration, Stack } from 'aws-cdk-lib';
+import type { aws_iam as iam } from 'aws-cdk-lib';
 import {
   aws_cloudfront as cloudfront,
   aws_cloudfront_origins as origins,
@@ -6,9 +8,8 @@ import {
   aws_ecr as ecr,
   aws_ecs as ecs,
   aws_elasticloadbalancingv2 as elbv2,
-  aws_iam as iam,
 } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
+import type { Construct } from 'constructs';
 import type { EnvProps } from '../types';
 
 export interface WebStackProps extends StackProps, EnvProps {
