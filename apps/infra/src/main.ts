@@ -1,6 +1,6 @@
 import { App } from 'aws-cdk-lib';
 import type { DeployEnv } from './types';
-import { VpcStack } from './stacks/vpc.stack';
+import { NetworkStack } from './stacks/network.stack';
 import { DatabaseStack } from './stacks/database.stack';
 import { StorageStack } from './stacks/storage.stack';
 import { ApiStack } from './stacks/api.stack';
@@ -20,7 +20,7 @@ const awsEnv = {
 const stackProps = { env: awsEnv, deployEnv };
 
 // Each stack is named FixFirst-{Name}-{env} for clear environment separation.
-new VpcStack(app, `FixFirst-Vpc-${deployEnv}`, stackProps);
+const networkStack = new NetworkStack(app, `FixFirst-Network-${deployEnv}`, stackProps);
 new DatabaseStack(app, `FixFirst-Database-${deployEnv}`, stackProps);
 new StorageStack(app, `FixFirst-Storage-${deployEnv}`, stackProps);
 new ApiStack(app, `FixFirst-Api-${deployEnv}`, stackProps);
