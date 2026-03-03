@@ -5,7 +5,11 @@ import type { CreateUserProductDto } from './dto/create-user-product.dto';
 import type { UpdateUserProductDto } from './dto/update-user-product.dto';
 
 const INCLUDE = {
-  product: true,
+  product: {
+    include: {
+      documents: { select: { id: true, type: true, filename: true, sizeBytes: true, createdAt: true } },
+    },
+  },
   warranties: { select: { id: true, type: true, endDate: true } },
 } as const;
 

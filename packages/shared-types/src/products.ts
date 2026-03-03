@@ -1,3 +1,5 @@
+import type { DocumentSummary } from './documents';
+
 export type WarrantyType = 'manufacturer' | 'statutory' | 'extended' | 'lifetime';
 
 export interface ProductSummary {
@@ -20,6 +22,8 @@ export interface WarrantySummary {
   createdAt: string;
 }
 
+export type DocumentSummaryBrief = Pick<DocumentSummary, 'id' | 'type' | 'filename' | 'sizeBytes' | 'createdAt'>;
+
 export interface UserProductDetail {
   id: string;
   userId: string;
@@ -28,6 +32,6 @@ export interface UserProductDetail {
   retailer: string | null;
   price: string | null;
   createdAt: string;
-  product: ProductSummary;
+  product: ProductSummary & { documents: DocumentSummaryBrief[] };
   warranties: Pick<WarrantySummary, 'id' | 'type' | 'endDate'>[];
 }
