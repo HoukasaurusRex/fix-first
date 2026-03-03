@@ -1,14 +1,29 @@
 import { App } from 'aws-cdk-lib';
-import { PlaceholderStack } from './stacks/placeholder.stack';
+import type { DeployEnv } from './types';
+import { VpcStack } from './stacks/vpc.stack';
+import { DatabaseStack } from './stacks/database.stack';
+import { StorageStack } from './stacks/storage.stack';
+import { ApiStack } from './stacks/api.stack';
+import { WebStack } from './stacks/web.stack';
 
 const app = new App();
 
-new PlaceholderStack(app, 'FixFirstStagingStack', {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION ?? 'ca-central-1' },
-});
+// Read environment from CDK context: cdk synth --context env=staging|production
+const rawEnv = app.node.tryGetContext('env') as string | undefined;
+const deployEnv: DeployEnv = rawEnv === 'production' ? 'production' : 'staging';
 
-new PlaceholderStack(app, 'FixFirstProdStack', {
-  env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION ?? 'ca-central-1' },
-});
+const awsEnv = {
+  account: process.env.CDK_DEFAULT_ACCOUNT,
+  region: process.env.CDK_DEFAULT_REGION ?? 'ca-central-1',
+};
+
+const stackProps = { env: awsEnv, deployEnv };
+
+// Each stack is named FixFirst-{Name}-{env} for clear environment separation.
+new VpcStack(app, `FixFirst-Vpc-${deployEnv}`, stackProps);
+new DatabaseStack(app, `FixFirst-Database-${deployEnv}`, stackProps);
+new StorageStack(app, `FixFirst-Storage-${deployEnv}`, stackProps);
+new ApiStack(app, `FixFirst-Api-${deployEnv}`, stackProps);
+new WebStack(app, `FixFirst-Web-${deployEnv}`, stackProps);
 
 app.synth();

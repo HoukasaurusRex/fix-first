@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "synth": "yarn build && cdk synth",
-    "deploy:staging": "yarn build && cdk deploy --app 'node dist/main.js' FixFirstStagingStack",
-    "deploy:prod": "yarn build && cdk deploy --app 'node dist/main.js' FixFirstProdStack --require-approval broadening",
+    "synth": "yarn build && cdk synth --context env=staging",
+    "synth:prod": "yarn build && cdk synth --context env=production",
+    "deploy:staging": "yarn build && cdk deploy --context env=staging --all",
+    "deploy:prod": "yarn build && cdk deploy --context env=production --all --require-approval broadening",
     "test": "echo \"No infra tests yet\" && exit 0"
   },
   "dependencies": {
