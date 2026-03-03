@@ -32,7 +32,22 @@ const sharedStack = new SharedStack(app, `FixFirst-Shared-${deployEnv}`, {
   assetsBucketArn: dataStack.assetsBucket.bucketArn,
 });
 sharedStack.addDependency(dataStack);
-new ApiStack(app, `FixFirst-Api-${deployEnv}`, stackProps);
+
+// ACM certificate ARNs must be provided via CDK context (created manually in ACM first).
+// Example: cdk synth --context env=staging --context certificateArn=arn:aws:acm:...
+const certificateArn = (app.node.tryGetContext('certificateArn') as string | undefined) ?? '';
+
+const apiStack = new ApiStack(app, `FixFirst-Api-${deployEnv}`, {
+  ...stackProps,
+  vpc: networkStack.vpc,
+  albSg: networkStack.albSg,
+  apiSg: networkStack.apiSg,
+  ecsTaskRole: sharedStack.ecsTaskRole,
+  appSecret: sharedStack.appSecret,
+  dbSecret: dataStack.dbSecret!,
+  certificateArn,
+});
+apiStack.addDependency(sharedStack);
 new WebStack(app, `FixFirst-Web-${deployEnv}`, stackProps);
 
 app.synth();
