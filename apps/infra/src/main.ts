@@ -2,6 +2,7 @@ import { App } from 'aws-cdk-lib';
 import type { DeployEnv } from './types';
 import { NetworkStack } from './stacks/network.stack';
 import { DataStack } from './stacks/data.stack';
+import { SharedStack } from './stacks/shared.stack';
 import { ApiStack } from './stacks/api.stack';
 import { WebStack } from './stacks/web.stack';
 
@@ -26,6 +27,11 @@ const dataStack = new DataStack(app, `FixFirst-Data-${deployEnv}`, {
   dbSg: networkStack.dbSg,
 });
 dataStack.addDependency(networkStack);
+const sharedStack = new SharedStack(app, `FixFirst-Shared-${deployEnv}`, {
+  ...stackProps,
+  assetsBucketArn: dataStack.assetsBucket.bucketArn,
+});
+sharedStack.addDependency(dataStack);
 new ApiStack(app, `FixFirst-Api-${deployEnv}`, stackProps);
 new WebStack(app, `FixFirst-Web-${deployEnv}`, stackProps);
 
