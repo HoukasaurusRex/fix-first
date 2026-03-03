@@ -8,6 +8,7 @@
     "synth:prod": "yarn build && cdk synth --context env=production",
     "deploy:staging": "yarn build && cdk deploy --context env=staging --all",
     "deploy:prod": "yarn build && cdk deploy --context env=production --all --require-approval broadening",
+    "lint": "eslint src --ext .ts",
     "test": "echo \"No infra tests yet\" && exit 0"
   },
   "dependencies": {

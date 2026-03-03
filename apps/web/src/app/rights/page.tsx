@@ -29,19 +29,10 @@ type LawEntry = {
   productCategory: string | null;
 };
 
-type Jurisdiction = {
-  id: string;
-  code: string;
-  name: string;
-  isProvincial: boolean;
-};
-
 type ApplicableLawsResponse = {
   jurisdiction: { code: string; name: string };
   laws: LawEntry[];
 };
-
-const FEDERAL_CODE = 'CA';
 
 export default function RightsPage() {
   const { user } = useAuth();
@@ -75,21 +66,35 @@ export default function RightsPage() {
       .finally(() => setLoading(false));
   }, [selectedProvince, categoryFilter]);
 
-  const federalLaws = data?.laws.filter((l) => {
-    // Federal laws come from the CA jurisdiction (included in the response)
-    // We identify them by checking which jurisdiction they belong to
-    // Since the API merges federal + provincial, we separate them by statute name pattern
-    // Actually, we need a better way. Let's fetch all jurisdictions to get IDs.
-    // For simplicity: laws without productCategory from a non-provincial context are federal.
-    // We'll use a heuristic: federal statutes contain "R.S.C." or "S.C."
-    return l.statute.includes('R.S.C.') || l.statute.includes('S.C. ') || l.statute.includes('federal') || l.statute.toLowerCase().includes('competition act') || l.statute.toLowerCase().includes('packaging');
-  }) ?? [];
+  const federalLaws =
+    data?.laws.filter((l) => {
+      // Federal laws come from the CA jurisdiction (included in the response)
+      // We identify them by checking which jurisdiction they belong to
+      // Since the API merges federal + provincial, we separate them by statute name pattern
+      // Actually, we need a better way. Let's fetch all jurisdictions to get IDs.
+      // For simplicity: laws without productCategory from a non-provincial context are federal.
+      // We'll use a heuristic: federal statutes contain "R.S.C." or "S.C."
+      return (
+        l.statute.includes('R.S.C.') ||
+        l.statute.includes('S.C. ') ||
+        l.statute.includes('federal') ||
+        l.statute.toLowerCase().includes('competition act') ||
+        l.statute.toLowerCase().includes('packaging')
+      );
+    }) ?? [];
 
   const provincialLaws = data?.laws.filter((l) => !federalLaws.includes(l)) ?? [];
 
   return (
     <main style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '1rem',
+        }}
+      >
         <h1>Canadian Consumer Rights</h1>
         <nav>
           <Link href="/dashboard">Dashboard</Link>
@@ -99,8 +104,8 @@ export default function RightsPage() {
       </header>
 
       <p>
-        Browse consumer protection laws that apply in your province. This is an educational
-        overview — not legal advice. For specific legal questions, consult a qualified lawyer or your
+        Browse consumer protection laws that apply in your province. This is an educational overview
+        — not legal advice. For specific legal questions, consult a qualified lawyer or your
         provincial consumer protection office.
       </p>
 
@@ -155,7 +160,16 @@ export default function RightsPage() {
                   >
                     <strong>{law.statute}</strong>
                     {law.productCategory && (
-                      <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#0369a1', background: '#e0f2fe', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                      <span
+                        style={{
+                          marginLeft: '0.5rem',
+                          fontSize: '0.8rem',
+                          color: '#0369a1',
+                          background: '#e0f2fe',
+                          padding: '0.1rem 0.4rem',
+                          borderRadius: '4px',
+                        }}
+                      >
                         {law.productCategory}
                       </span>
                     )}
@@ -185,7 +199,16 @@ export default function RightsPage() {
                   >
                     <strong>{law.statute}</strong>
                     {law.productCategory && (
-                      <span style={{ marginLeft: '0.5rem', fontSize: '0.8rem', color: '#166534', background: '#dcfce7', padding: '0.1rem 0.4rem', borderRadius: '4px' }}>
+                      <span
+                        style={{
+                          marginLeft: '0.5rem',
+                          fontSize: '0.8rem',
+                          color: '#166534',
+                          background: '#dcfce7',
+                          padding: '0.1rem 0.4rem',
+                          borderRadius: '4px',
+                        }}
+                      >
                         {law.productCategory}
                       </span>
                     )}
@@ -196,9 +219,12 @@ export default function RightsPage() {
             )}
           </section>
 
-          <p style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#9ca3af', fontStyle: 'italic' }}>
+          <p
+            style={{ marginTop: '2rem', fontSize: '0.8rem', color: '#9ca3af', fontStyle: 'italic' }}
+          >
             The information above is provided for educational purposes only and does not constitute
-            legal advice. Laws change — always verify current statutes with official government sources.
+            legal advice. Laws change — always verify current statutes with official government
+            sources.
           </p>
         </>
       )}

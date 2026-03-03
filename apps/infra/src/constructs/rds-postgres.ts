@@ -1,5 +1,5 @@
 import { Construct } from 'constructs';
-import { aws_ec2 as ec2, aws_rds as rds } from 'aws-cdk-lib';
+import type { aws_ec2 as ec2 } from 'aws-cdk-lib';
 
 export interface RdsPostgresProps {
   /** VPC in which the database cluster runs. */

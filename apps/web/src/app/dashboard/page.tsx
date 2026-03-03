@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ProtectedRoute } from '../../components/protected-route';
 import { useApi } from '../../hooks/use-api';
 import { useAuth } from '../../context/auth';
-import type { UserProductDetail, WarrantySummary } from '@fixfirst/shared-types';
+import type { UserProductDetail } from '@fixfirst/shared-types';
 
 function warrantyBadge(warranties: UserProductDetail['warranties']): {
   label: string;
@@ -78,7 +78,9 @@ function DashboardContent() {
       {error && <p role="alert">{error}</p>}
 
       {!loading && !error && products.length === 0 && (
-        <p>No products yet. <Link href="/products/new">Add your first product</Link>.</p>
+        <p>
+          No products yet. <Link href="/products/new">Add your first product</Link>.
+        </p>
       )}
 
       <ul style={{ listStyle: 'none', padding: 0 }}>
@@ -91,13 +93,16 @@ function DashboardContent() {
           });
 
           return (
-            <li key={up.id} style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '1rem' }}>
+            <li
+              key={up.id}
+              style={{ marginBottom: '1rem', border: '1px solid #ddd', padding: '1rem' }}
+            >
               <Link href={`/products/${up.id}`}>
-                <strong>{up.product.brand} {up.product.model}</strong>
+                <strong>
+                  {up.product.brand} {up.product.model}
+                </strong>
               </Link>
-              <span style={{ marginLeft: '0.5rem', color: badge.color }}>
-                ● {badge.label}
-              </span>
+              <span style={{ marginLeft: '0.5rem', color: badge.color }}>● {badge.label}</span>
               {expiringWarranties.map((w) => {
                 const days = Math.ceil(
                   (new Date(w.endDate!).getTime() - Date.now()) / (24 * 60 * 60 * 1000),
